@@ -3,3 +3,13 @@
 
 # Export all names
 exportPattern(".")
+
+# Imports
+importFrom("stats", "qnorm", "var")
+
+S3method(ci, matrix)
+S3method(ci, numeric)
+S3method(distill, data.frame)
+S3method(distill, list)
+S3method(distill, matrix)
+S3method(print, ci)
