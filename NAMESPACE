@@ -5,11 +5,20 @@
 exportPattern(".")
 
 # Imports
-importFrom("stats", "qnorm", "var")
+importFrom("stats", "pnorm", "quantile", "qnorm", "sd", "var")
+importFrom("graphics", "abline", "legend", "plot", "points")
 
 S3method(ci, matrix)
 S3method(ci, numeric)
+S3method(ci, booted)
 S3method(distill, data.frame)
 S3method(distill, list)
 S3method(distill, matrix)
 S3method(print, ci)
+S3method(print, booted)
+S3method(summary, booted)
+S3method(print, ci.booted)
+S3method(print, tibbed)
+S3method(plot, tibbed)
+S3method(print, tibRMed)
+S3method(plot, tibRMed)
