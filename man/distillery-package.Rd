@@ -17,7 +17,7 @@ Primary functions include:
 
 \code{ci}: Calculate confidence intervals.  This is a method function for calculating confidence intervals.  Includes methods for numeric vectors and matrices, whereby the mean is taken (column-wise for matrices) and normal approximation confidence intervals for the mean are calculated and returned.
 
-\code{booter} and \code{pbooter}: Functions to perform bootstrap resampling that work with \code{ci}.  Allows for m < n bootstrap resampling, circular block bootstrapping, and parametric bootstrap resampling.
+\code{booter}, \code{pbooter} and \code{tibber}: Functions to perform bootstrap resampling that work with \code{ci} (\code{booter} and \code{pbooter}).  Allows for m < n bootstrap resampling, circular block bootstrapping, parametric bootstrap resampling (\code{pbooter}), and the test-inversion bootstrap approach (\code{tibber}).
 
 }
 

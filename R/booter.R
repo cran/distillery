@@ -4,8 +4,8 @@ booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle =
 
     if( block.length < 1 ) stop( "booter: invalid block.length argument." )
     if( missing( statistic ) ) stop( "booter: must specify statistic argument." )
-    if( missing( B ) && is.null( shuffle ) ) stop( "booter: must specify B argument." )
-    if( !is.null( shuffle ) && B < 1 ) stop( "booter: invalid B argument." )
+    if( missing( B ) && is.null( shuffle ) ) stop( "booter: must specify B or shuffle arguments." )
+    if( !missing( B ) ) if( B < 1 ) stop( "booter: invalid B argument." )
 
     if( is.null( dim( x ) ) ) N <- length( x )
     else N <- dim( x )[ 1 ]
@@ -22,7 +22,7 @@ booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle =
 
         if( block.length > 1 ) {
 
-	    id <- apply( matrix( id, ncol = 1 ), 1, function( x ) return( x:(x + block.length) ) )
+	    id <- apply( matrix( id, ncol = 1 ), 1, function( x ) return( x:( x + block.length - 1 ) ) )
 	    if( any( id > N ) ) id[ id > N ] <- id[ id > N ] - N
 	    id <- c( id )
 
@@ -90,78 +90,10 @@ booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle =
 
 } # end of 'booter.vector' function.
 
-pbooter <- function( x, statistic, B, rmodel, rsize, v.terms, ... ) {
-
-    theCall <- match.call()
-
-    if( missing( statistic ) ) stop( "booter: must specify statistic argument." )
-    if( missing( B ) ) stop( "booter: must specify B argument." )
-    if( B < 1 ) stop( "booter: invalid B argument." )
-
-    if( missing( rsize ) ) stop( "pbooter: must specify rsize argument." )
-    if( rsize < 1 ) stop( "pbooter: invalid rsize argument." )
-
-    xdim <- dim( x )
-    if( is.null( xdim ) ) isv <- TRUE
-    else isv <- FALSE
-
-    bfun <- function( x, statistic, ... ) {
-
-	return( do.call( statistic, c( list( data = x ), list( ... ) ) ) )
-
-    } # end of 'bfun' function.
-
-    xdat <- do.call( rmodel, c( list( size = rsize * B ), list( ... ) ) )
-
-    if( isv ) {
-
-	xdat <- matrix( xdat, rsize, B )
-        res <- apply( xdat, 2, bfun, statistic = statistic, ... )
-
-    } else {
-
-	hold <- array( dim = c( rsize, xdim[ 2 ], B ) )
-	for( i in 1:B ) hold[,, i ] <- xdat[ ( ( i - 1 ) * rsize + 1 ):( ( i - 1 ) * rsize + rsize ), ]
- 	xdat <- hold
-	res <- apply( xdat, 3, bfun, statistic = statistic, ... )
-
-    } # end of does 'rmodel' return a vector or a matrix stmts.
-
-    original.est <- do.call( statistic, c( list( data = x ), list( ... ) ) )
-
-    out <- list()
-    out$call <- theCall
-    out$data <- x
-    out$statistic <- statistic
-    out$statistic.args <- list( ... )
-    out$B <- B
-    if( !missing( v.terms ) ) out$v.terms <- v.terms
-    out$rsize <- rsize
-    out$rdata <- xdat
-
-    if( !missing( v.terms ) ) {
-
-        out$v <- res[ v.terms, ]
-        res <- res[ -v.terms, ]
-        out$orig.v <- original.est[ v.terms ]
-        original.est <- original.est[ -v.terms ]
-
-    }
-
-    out$original.est <- original.est
-    out$results <- res
-
-    out$type <- "parametric"
-
-    class( out ) <- "booted"
-
-    return( out )
-
-} # end of 'pbooter' function.
-
 ci.booted <- function( x, alpha = 0.05, ..., type = c( "perc", "basic", "stud", "bca", "norm" ) ) {
 
-    if( is.element( "stud", type ) && is.null( x$v ) ) stop( "ci: no variance to do Studentized intervals." )
+    if( missing( type ) && is.null( x$v ) ) type <- type[ -3 ]
+    # else if( is.element( "stud", type ) && is.null( x$v ) ) stop( "ci: no variance to do Studentized intervals." )
 
     out <- list()
 
@@ -292,11 +224,15 @@ ci.booted <- function( x, alpha = 0.05, ..., type = c( "perc", "basic", "stud", 
 	    a1 <- pnorm( zL )
 	    a2 <- pnorm( zU )
 
-	    bca <- c( quantile( res, probs = a1 ), est, quantile( res, probs = a2 ) )
+	    bca <- c( quantile( res, probs = a1, na.rm = TRUE ), est, quantile( res, probs = a2, na.rm = TRUE ) )
 	    names( bca ) <- nomen
 
-	    if( bca[ 1 ] > bca[ 3 ] || bca[ 1 ] == bca[ 3 ] ) bca[ c( 1, 3 ) ] <- NA
-	    if( bca[ 1 ] > bca[ 2 ] || bca[ 2 ] > bca[ 3 ] ) bca[ c( 1, 3 ) ] <- NA
+	    if( !any( is.na( bca ) ) ) {
+
+	        if( bca[ 1 ] > bca[ 3 ] || bca[ 1 ] == bca[ 3 ] ) bca[ c( 1, 3 ) ] <- NA
+	        if( !is.na( bca[ 2 ] ) ) if( bca[ 1 ] > bca[ 2 ] || bca[ 2 ] > bca[ 3 ] ) bca[ c( 1, 3 ) ] <- NA
+
+	    } else bca[ c( 1, 3 ) ] <- NA
 
 	} else {
 
@@ -316,8 +252,8 @@ ci.booted <- function( x, alpha = 0.05, ..., type = c( "perc", "basic", "stud", 
 	    thL <- thU <- numeric( 0 )
 	    for( i in 1:npar ) {
 
-		thL <- c( thL, quantile( res[ i, ], probs = a1[ i ] ) )
-		thU <- c( thU, quantile( res[ i, ], probs = a2[ i ] ) )
+		thL <- c( thL, quantile( res[ i, ], probs = a1[ i ], na.rm = TRUE ) )
+		thU <- c( thU, quantile( res[ i, ], probs = a2[ i ], na.rm = TRUE ) )
 
 	    } # end of for 'i' loop.
 
@@ -427,17 +363,26 @@ summary.booted <- function( object, ... ) {
 
     if( !silent ) print( x )
 
-    if( is.matrix( x$results ) ) m <- apply( x$results, 1, mean, na.rm = TRUE )
-    else m <- mean( x$results )
+    if( is.matrix( x$results ) ) { 
 
-    out <- cbind( x$original.est, x$original.est - m )
+	    m <- apply( x$results, 1, mean, na.rm = TRUE )
+	    v <- apply( x$results, 1, var, na.rm = TRUE )
+
+    } else {
+
+	    m <- mean( x$results )
+	    v <- var( x$results )
+    }
+
+    out <- cbind( x$original.est, x$original.est - m, v )
 
     if( !is.null( x$v ) ) {
 
 	out <- cbind( out, x$orig.v )
-	colnames( out ) <- c( "Estimate", "Bias", "Variance" )
+    	colnames( out ) <- c( "Estimate", "Bias", "Variance*", "Variance.orig" )
 
-    } else colnames( out ) <- c( "Estimate", "Bias" )
+    } else colnames( out ) <- c( "Estimate", "Bias", "Variance" )
+    # else colnames( out ) <- c( "Estimate", "Bias" )
 
     if( !silent ) print( out )
 

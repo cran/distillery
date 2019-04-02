@@ -5,14 +5,14 @@
 Bootstrap Confidence Intervals
 }
 \description{
-Calculate confidence intervals for objects output from the booter function.
+Calculate confidence intervals for objects output from the booter and pbooter functions.
 }
 \usage{
 \method{ci}{booted}(x, alpha = 0.05, ..., type = c("perc", "basic", "stud", "bca", "norm"))
 }
 \arguments{
   \item{x}{
-object of class \dQuote{booted} as returned by the \code{booter} function.
+object of class \dQuote{booted} as returned by the \code{booter} or \code{pbooter} function.
 }
   \item{alpha}{
 Significance level for which the (1 - alpha) * 100 percent confidence intervals are determined.

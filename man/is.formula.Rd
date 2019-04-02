@@ -15,7 +15,7 @@ An R object.
 }
 }
 \details{
-This is a very simple function that simplifies checking that the class of an object is a formula or not.
+This function is a very simple one that simplifies checking whether or not the class of an object is a formula or not.
 }
 \value{
 single logical

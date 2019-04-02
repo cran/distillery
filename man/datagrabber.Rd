@@ -30,7 +30,7 @@ Eric Gilleland
 
 \examples{
 \dontrun{
-## From the extRems (>= 2.0) package.
+## From the extRemes (>= 2.0) package.
 y <- rnorm(100, mean=40, sd=20)
 y <- apply(cbind(y[1:99], y[2:100]), 1, max)
 bl <- rep(1:3, each=33)

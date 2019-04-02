@@ -34,10 +34,13 @@ tibber <- function( x, statistic, B, rmodel, test.pars, rsize, block.length = 1,
 
     if( !missing( v.terms ) ) {
 
+	if( length( obs ) > 2 ) stop( "tibber: statistic must return only one value, or one value and its variance." )
+
 	obs.v <- obs[ v.terms ]
 	obs <- obs[ -v.terms ]
 
-    } # end of 'v.terms' missing or not stmts.
+    } else if( length( obs ) > 1 ) stop( "tibber: statistic must return only one value." )
+    # end of 'v.terms' missing or not stmts.
 
     tfun <- function( tp, x, st, B, rmodel, N, rsize, bl, v.terms, 
 		shuffle, replace, o, osd, ... ) {
@@ -185,6 +188,10 @@ tibber <- function( x, statistic, B, rmodel, test.pars, rsize, block.length = 1,
         Q2 <- Q[ q2 ]
     
         L <- ( Q1 - Q2 ) * ( P2 - ( 1 - a2 ) ) / ( P2 - P1 ) + Q2
+
+	out$Plow <- c( P1, P2 )
+
+	# Plow.est <- P1 + ( P2 - P1 ) * ( L - Q1 ) / ( Q2 - Q1 )
     
         q1 <- min( which( P <= a2 ), na.rm = TRUE )
         q2 <- max( which( P > a2 ), na.rm = TRUE )
@@ -196,11 +203,18 @@ tibber <- function( x, statistic, B, rmodel, test.pars, rsize, block.length = 1,
         Q2 <- Q[ q2 ]
     
         U <- ( Q1 - Q2 ) * ( P2 - a2 ) / ( P2 - P1 ) + Q2
+
+	out$Pup <- c( P1, P2 )
     
         # Note: if it is possible to have multiple statistics, then the following will need modification.
         tib <- c( L, obs, U )
         names( tib ) <- c( "Lower", "Estimate", "Upper" )
-    
+
+	# Pup.est <- P1 + ( P2 - P1 ) * ( U - Q1 ) / ( Q2 - Q1 )
+
+	# pval.estimated <- c( 1 - Plow.est, 1 - Pup.est )
+        # names( pval.estimated ) <- c( "lower", "upper" )
+
         out$TIB.interpolated <- tib
     
         if( !missing( v.terms ) ) {
@@ -218,6 +232,10 @@ tibber <- function( x, statistic, B, rmodel, test.pars, rsize, block.length = 1,
     	    Q2 <- Q[ q2stud ]
     
     	    Lstud <- ( Q1 - Q2 ) * ( P2stud - ( 1 - a2 ) ) / ( P2stud - P1stud ) + Q2
+
+	    out$PstudLow <- c( P1stud, P2stud )
+
+	    # PstudLow <- P1stud + ( P2stud - P1stud ) * ( Lstud - Q1 ) / ( Q2 - Q1 )
     
     	    q1stud <- min( which( Pstud <= a2 ), na.rm = TRUE )
             q2stud <- max( which( Pstud > a2 ), na.rm = TRUE )
@@ -233,8 +251,17 @@ tibber <- function( x, statistic, B, rmodel, test.pars, rsize, block.length = 1,
 	    stib <- c( Lstud, obs, Ustud ) 
 	    names( stib ) <- c( "Lower", "Estimate", "Upper" )
     	    out$STIB.interpolated <- stib
+
+	    out$PstudUp <- c( P1stud, P2stud )
+
+	    # PstudUp <- P1stud + ( P2stud - P1stud ) * ( Ustud - Q1 ) / (Q2 - Q1 )
+
+	    # pval.estimated <- rbind( pval.estimated, c( 1 - PstudLow, 1 - PstudUp ) )
+	    # rownames( pval.estimated ) <- c( "regular", "studentized" )
     
         } # end of if do STIB interval stmt.
+
+	# out$estimated.pvalue <- pval.estimated
     
         out$call <- theCall
     
@@ -530,6 +557,9 @@ print.tibbed <- function( x, ... ) {
 
     }
 
+    # cat( "\nEstimated achieved p-values:\n" )
+    # print( x$estimated.pvalue )
+
     invisible()
 
 } # end of 'print.tibbed' function.
@@ -542,12 +572,12 @@ plot.tibbed <- function( x, ..., type = c("pvalue", "estimates") ) {
     if( type == "pvalue" ) {
 
 	y  <- x$results[ 3, ]
-	xl <- "Bootstrap estimated p-value"
+	yl <- "Bootstrap estimated p-value"
 
     } else {
 
 	y <- x$results[ 2, ]
-	xl <- "Median Parameter Estimate from Bootstrap Resamples"
+	yl <- "Median Parameter Estimate from Bootstrap Resamples"
 
     }
 
@@ -560,9 +590,9 @@ plot.tibbed <- function( x, ..., type = c("pvalue", "estimates") ) {
 
     a <- list( ... )
 
-    if( is.null( a$xlab ) && is.null( a$ylab ) ) plot( theta1, y, xlab = xl, ylab = "Est. Parameter", ... )
-    else if( is.null( a$xlab ) ) plot( theta1, y, xlab = xl, ... )
-    else if( is.null( a$ylab ) ) plot( theta1, y, ylab = "Est. Parameter", ... )
+    if( is.null( a$xlab ) && is.null( a$ylab ) ) plot( theta1, y, ylab = "Est. Parameter", xlab = yl, ... )
+    else if( is.null( a$xlab ) ) plot( theta1, y, ylab = yl, ... )
+    else if( is.null( a$ylab ) ) plot( theta1, y, xlab = "Est. Parameter", ... )
     else plot( theta1, y, ... )
 
     if( type == "pvalue" ) abline( v = x$TIB.interpolated, h = c( x$alpha / 2, 1 - x$alpha / 2 ), col = "blue" )

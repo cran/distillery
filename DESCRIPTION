@@ -1,6 +1,6 @@
 Package: distillery
-Version: 1.0-4
-Date: 2017-06-07
+Version: 1.0-6
+Date: 2019-03-28
 Title: Method Functions for Confidence Intervals and to Distill
         Information from an Object
 Author: Eric Gilleland
@@ -10,6 +10,6 @@ Description: Some very simple method functions for confidence interval calculati
 License: GPL (>= 2)
 URL: http://www.ral.ucar.edu/staff/ericg
 NeedsCompilation: no
-Packaged: 2017-06-20 17:23:15 UTC; ericg
+Packaged: 2019-04-02 17:12:03 UTC; eric
 Repository: CRAN
-Date/Publication: 2017-06-20 18:55:10 UTC
+Date/Publication: 2019-04-02 19:50:03 UTC

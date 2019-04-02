@@ -75,6 +75,7 @@ Eric Gilleland
 
 \seealso{
 \code{\link{pbooter}}, \code{\link{ci.booted}}
+\code{tibber}
 }
 \examples{
 

@@ -27,12 +27,12 @@ function giving the estimated parameter value.  Must minimally contain arguments
 number of replicated bootstrap samples to use.
 }
   \item{rmodel}{
-function that estimates data based given the nuisance parameter provided by \code{test.pars}.  Must minimally take arguments: \code{data}, \code{par}, \code{n}, and \code{\ldots}.  The first, \code{data}, is the data series (it need not be used by the function, but it must have this argument, and the original data are passed to it via this argument), \code{par} is the nuisance parameter, \code{n} is the sample size, and \code{\ldots} are any additional arguments that might be needed.
+function that simulates data based on the nuisance parameter provided by \code{test.pars}.  Must minimally take arguments: \code{data}, \code{par}, \code{n}, and \code{\ldots}.  The first, \code{data}, is the data series (it need not be used by the function, but it must have this argument, and the original data are passed to it via this argument), \code{par} is the nuisance parameter, \code{n} is the sample size, and \code{\ldots} are any additional arguments that might be needed.
 }
   \item{test.pars}{
 single number or vector giving the nuisance parameter value.  If a vector of length greater than one, then the interpolation method will be applied to estimate the confidence bounds.
 }
-  \item{startval}{one or two numbers giving the starting value for the nuisance parameter in the Robbins-Monro algorithm.}
+  \item{startval}{one or two numbers giving the starting value for the nuisance parameter in the Robbins-Monro algorithm.  If two numbers are given, the first is used as the starting value for the lower bound, and the second for the upper.}
   \item{rsize}{
 (optional) numeric less than the length of the series given by \code{x}, used if an m-out-of-n bootstrap sampling procedure should be used.
 }
@@ -63,16 +63,17 @@ Optional arguments to \code{booter}, \code{statistic} and \code{rmodel}.
 }
 }
 \details{
-The test-inversion bootstrap (Carpenter 1999; Carpenter and Bithell 2000; Kabaila 1993) is a parametric bootstrap procedure that attempts to take advantage of the duality between confidence intervals and hypothesis tests in order to create bootstrap confidence intervals.  Let X = X_1,\dots,X_n is a series of random variables, T, is a parameter of interest, and R(X) is an estimator for T.  Further, let x = x_1,\ldots,x_n be an observed realization of X, and r(x) an estimate for R(X), and let x* be a bootstrap resample of x, etc.  Suppose that X is distributed according to a distribution, F, with parameter T and nuisance parameter V.
+The test-inversion bootstrap (Carpenter 1999; Carpenter and Bithell 2000; Kabaila 1993) is a parametric bootstrap procedure that attempts to take advantage of the duality between confidence intervals and hypothesis tests in order to create bootstrap confidence intervals.  Let X = X_1,\dots,X_n be a series of random variables, T, is a parameter of interest, and R(X) is an estimator for T.  Further, let x = x_1,\ldots,x_n be an observed realization of X, and r(x) an estimate for R(X), and let x* be a bootstrap resample of x, etc.  Suppose that X is distributed according to a distribution, F, with parameter T and nuisance parameter V.
 
-The procedure is carried out by estimating the p-value, say p*, from r*_1, ..., r*_B estimated from a simulated sample from \code{rmodel} assuming a specific value of V by way of finding the sum of r*_i < r(x) (with an additional correction for the ties r*_i = r(x)).  The procedure is repeated for each of k values of V to form a sample of p-values, p*_1, ..., p*_k.  Finally, some form of root-finding algorithm must be employed to find the values r*_L and r*_U that estimate the lower and upper values, resp., for R(X) associated with (1 - alpha) * 100 percent confidence limits.  For \code{tibber}, the routine can be executed one time if \code{test.pars} is of length one, which will enable a user to employ their own root-finding algorithm.  If \code{test.pars} is vector, then an interpolation estimate is found for the confidence end points.  \code{tibberRM} makes successive calls to \code{tibber} and uses the Robbins-Monro algorithm (Robbins and Monro 1951) to try to find the appropriate bounds, as suggested by Garthwaite and Buckland (1992).
+The procedure is carried out by estimating the p-value, say p*, from r*_1, ..., r*_B estimated from a simulated sample from \code{rmodel} assuming a specific value of V by way of finding the sum of r*_i < r(x) (with an additional correction for the ties r*_i = r(x)).  The procedure is repeated for each of k values of V to form a sample of p-values, p*_1, ..., p*_k.  Finally, some form of root-finding algorithm must be employed to find the values r*_L and r*_U that estimate the lower and upper values, resp., for R(X) associated with (1 - alpha) * 100 percent confidence limits.  For \code{tibber}, the routine can be executed one time if \code{test.pars} is of length one, which will enable a user to employ their own root-finding algorithm.  If \code{test.pars} is a vector, then an interpolation estimate is found for the confidence end points.  \code{tibberRM} makes successive calls to \code{tibber} and uses the Robbins-Monro algorithm (Robbins and Monro 1951) to try to find the appropriate bounds, as suggested by Garthwaite and Buckland (1992).
 }
 \value{
 For tibber, if test.pars is of length one, then a 3 by 1 matrix is returned (or, if \code{v.terms} is supplied, then a 4 by 1 matrix) where the first two rows give estimates for R(X) based on the original simulated series and the median from the bootstrap samples, respectively.  the last row gives the estimated p-value.  If \code{v.terms} is supplied, then the fourth row gives the p-value associated with the Studentized p-value.
 
 If test.pars is a vector with length k > 1, then a list object of class \dQuote{tibbed} is returned, which has components:
   \item{results}{3 by k matrix (or 4 by k, if \code{v.terms} is not missing) giving two estimates for R(X) (one from the simulated series and one of the median of the bootstrap resamples, resp.) and the third row giving the estimated p-value for each value of V. }
-  \item{TIB.interpolated, STIB.interpolated}{numeric vector of length 3 giving the lower bound estimate, the estimate from the original data (i.e., r(x)), and the estimated upper bound as obtained from interpolating over the vector of possible values for V given by test.pars.  The Studentized TIB interval, \code{STIB.interpolated}, is only returned if \code{v.terms} provided.}
+  \item{TIB.interpolated, STIB.interpolated}{numeric vector of length 3 giving the lower bound estimate, the estimate from the original data (i.e., r(x)), and the estimated upper bound as obtained from interpolating over the vector of possible values for V given by test.pars.  The Studentized TIB interval, \code{STIB.interpolated}, is only returned if \code{v.terms} is provided.}
+  \item{Plow, Pup, PstudLow, PstudUp}{Estimated p-values used for interpolation of p-value. }
   \item{call}{the original function call.}
   \item{data}{the original data passed by the x argument.}
   \item{statistic, B, rmodel, test.pars, rsize, block.length, alpha, replace}{arguments passed into the orignal function call.}
@@ -106,7 +107,7 @@ Eric Gilleland
 }
 
 \seealso{
-\code{\link{booter}}
+\code{\link{booter}}, \code{\link{pbooter}}
 }
 \examples{
 # The following example follows the example provided at:
@@ -147,7 +148,7 @@ look
 
 plot( look )
 # outer vertical blue lines should cross horizontal blue lines
-# where an estimated p-value is located.
+# near where an estimated p-value is located.
 
 tibber( x = y, statistic = trm, B = 500, rmodel = genf, test.pars = 1 )
 
