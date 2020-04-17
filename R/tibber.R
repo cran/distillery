@@ -590,7 +590,7 @@ plot.tibbed <- function( x, ..., type = c("pvalue", "estimates") ) {
 
     a <- list( ... )
 
-    if( is.null( a$xlab ) && is.null( a$ylab ) ) plot( theta1, y, ylab = "Est. Parameter", xlab = yl, ... )
+    if( is.null( a$xlab ) && is.null( a$ylab ) ) plot( theta1, y, xlab = "Est. Parameter", ylab = yl, ... )
     else if( is.null( a$xlab ) ) plot( theta1, y, ylab = yl, ... )
     else if( is.null( a$ylab ) ) plot( theta1, y, xlab = "Est. Parameter", ... )
     else plot( theta1, y, ... )

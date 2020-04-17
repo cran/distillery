@@ -5,8 +5,8 @@
 exportPattern(".")
 
 # Imports
-importFrom("stats", "pnorm", "quantile", "qnorm", "sd", "var")
-importFrom("graphics", "abline", "legend", "plot", "points")
+importFrom("stats", "pnorm", "quantile", "qnorm", "sd", "var", "ecdf", "qqplot" )
+importFrom("graphics", "abline", "legend", "plot", "points", "boxplot", "hist", "lines", "par" )
 
 S3method(ci, matrix)
 S3method(ci, numeric)
@@ -22,3 +22,4 @@ S3method(print, tibbed)
 S3method(plot, tibbed)
 S3method(print, tibRMed)
 S3method(plot, tibRMed)
+S3method(plot, booted)

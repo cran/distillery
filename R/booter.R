@@ -88,7 +88,207 @@ booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle =
 
     return( out )
 
-} # end of 'booter.vector' function.
+} # end of 'booter' function.
+
+plot.booted <- function( x, ..., which = 1, type = c( "ecdf", "qq", "box", "hist", "qq2" ), col = 1, distn = "norm" , distn.args = NULL, distnLongName = "Standard Normal", add.legend = TRUE ) {
+
+	if( missing( type ) ) type <- c( "ecdf", "qq", "box", "hist" )
+	else type <- match.arg( type )
+
+	if( is.element( "qq2", type ) && length( which ) != 2 ) stop( "plot.booted: invalid which argument for qq2 option." )
+
+	if( length( type ) > 1 ) {
+
+		opar <- par( "mfrow" )
+
+		if( length( type ) == 2 ) par( mfrow = c(1, 2) )
+		else if( length( type ) %in% c( 3, 4 ) ) par( mfrow = c(2, 2) )
+		else par( mfrow = c(2, 3) )
+
+	} # end of set up plot display.
+
+	if( missing( col ) ) {
+
+		if( length( type ) == 1 ) col <- "black"
+		else if( length( type ) == 2 ) col <- c( "black", "gray" )
+		else col <- 1:length( col )
+
+	} # end of if missing 'col' argument stmts.
+
+	if( !is.null( x$parnames ) ) pnames <- x$parnames[ which ]
+	else {
+
+		pnames <- paste( "theta.hat", 1:length( which ), "*", sep = "" )
+		# pnames <- character(0)
+		# for( i in 1:length( which ) ) pnames <- c( pnames, expression( hat( theta )[i] ) )
+
+	} # end of if else 'parnames' not null stmt.
+
+	## Make empirical CDF plot if type is "ecdf".
+	if( "ecdf" %in% type ) {
+		
+		plotBootECDF( x = x, ..., which = which, col = col,
+			     distn = distn, distn.args = distn.args,
+			     distnLongName = distnLongName, pnames = pnames,
+			     add.legend = add.legend )
+
+	} # end of if make ecdf plot stmt.
+
+	if( "qq" %in% type ) {
+
+		plotBootQQ( x = x, ..., which = which, col = col,
+			     distn = distn, distn.args = distn.args,
+			     distnLongName = distnLongName, pnames = pnames,
+			     add.legend = add.legend )
+
+	} # end of if make qq plot stmt.
+
+	if( "box" %in% type ) plotBootBox( x = x, ..., which = which, col = col, pnames = pnames )
+	# end of if make box plot stmt.
+
+	if( "hist" %in% type ) {
+	       
+		plotBootHist( x = x, ..., which = which, col = col,
+				distn = distn, distn.args = distn.args,
+				distnLongName = distnLongName, pnames = pnames,
+				add.legend = add.legend )
+
+	} # end of if make histogram stmt.
+
+	if( "qq2" %in% type ) plotBootQQ2( x = x, ..., which = which, col = col, pnames = pnames )
+
+	if( length( type ) > 1 ) par( mfrow = opar )
+
+	invisible()
+
+} # end of 'plot.booted' function.
+
+plotBootECDF <- function(  x, ..., which = 1, col, distn, distn.args, distnLongName, pnames, add.legend ) {
+
+	if( is.matrix( x$data ) ) N <- nrow( x$data )
+	else N <- length( x$data )
+
+	z <- x$results[ which[ 1 ], ]
+	Fn <- ecdf( z )
+
+        plot( Fn, col = col[ 1 ], main = "Empirical CDF" )
+
+	# Add the parametric distribution if desired.
+	if( !is.na( distn ) && distn != "" ) {
+
+		pdistn <- paste( "p", distn, sep = "" )
+		qdistn <- paste( "q", distn, sep = "" )
+		zq <- do.call( qdistn, args = c( list( p = ( 1 - 0.5 ) / N ), distn.args ) )
+		# zd <- approx( seq( 0, 1,, 100 ), zq, n = N )$y
+		zp <- do.call( pdistn, args = c( list( q = zq ), distn.args ) )
+		lines( zq, zp, lty = 2, ... )
+		theory.message <- paste( distnLongName, "CDF" )
+
+	} else theory.message <- NULL
+	# end of add theoretical distribution stmt.
+
+        if( length( which ) > 1 ) {
+
+		Fn2 <- list()
+		if( length( col ) == 1 ) col <- rep( col, length( which ) )
+
+	        for( i in 2:length( which ) ) {
+
+			Fn2[[ i - 1 ]] <- ecdf( x$results[ which[ i ], ] )
+			plot( Fn2[[ i - 1 ]], add = TRUE, col = col[ i ] )
+
+		} # end of for 'i' loop.
+
+	} # end of if 'which > 1' stmt
+
+	pnames <- c( pnames, theory.message )
+	if( !is.null( theory.message ) ) {
+
+	       	col <- c( col, "black" )
+		ltype <- c( rep( 1, length( which ) ), 2 )
+
+	} else ltype <- 1
+	if( add.legend ) legend( "topleft", legend = pnames, col = col, lty = ltype, bty = "n" )
+
+	invisible()
+
+} # end of 'plotBootECDF' function. 
+
+plotBootQQ <- function( x, ..., which, col, distn, distn.args, distnLongName, pnames, add.legend ) {
+
+	z <- x$results[ which[ 1 ], ]
+	N <- length( z )
+	qdistn <- paste( "q", distn, sep = "" )
+	zq <- do.call( qdistn, args = c( list( p = ( 1:N - 0.5 ) / N ), distn.args ) )
+
+	qqplot( zq, z, xlab = paste( distnLongName, "Quantiles" ), ylab = "Bootstrap Sample Quantiles", col = col[ 1 ] )
+
+	if( length( which ) > 1 ) {
+
+		if( length( col ) == 1 ) col <- c( col, 2:length( which ) )
+
+		for( i in 2:length( which ) ) {
+
+			newq <- qqplot( x = zq, y = x$results[ which[ i ], ], plot.it = FALSE )
+			points( newq$x, newq$y, col = col[ i ], pch = "+" )
+
+		} # end of for 'i' loop.
+
+		if( add.legend ) legend( "topleft", legend = pnames, col = col, bty = "n" )
+
+	} # end of if add more quantiles to plot statement.
+
+	invisible()
+
+} # end of 'plotBootQQ' function.
+
+plotBootBox <- function( x, ..., which, col, pnames ) {
+
+	y <- as.data.frame( t( x$results[ which, , drop = FALSE ] ) )
+	colnames( y ) <- pnames
+
+	boxplot( y, col = col, ... )
+
+	invisible()
+
+} # end of 'plotBootBox' function.
+
+plotBootHist <- function( x, ..., which, col, distn, distn.args, distnLongName, pnames, add.legend ) {
+
+	if( length( which ) > 1 )
+		warning( "plotBootHist: which argument has length > 1. Only first is used in the histogram." )
+
+	y <- x$results[ which[ 1 ], ]
+	hist( y, main = paste( "Histogram of ", pnames[ 1 ], sep = "" ), xlab = pnames[ 1 ], freq = FALSE )
+
+	if( !is.na( distn ) && distn != "" ) {
+
+		r <- range( y, finite = TRUE )
+		z <- seq( r[ 1 ], r[ 2 ], , 200 )
+		ddistn <- paste( "d", distn, sep = "" )
+		zd <- do.call( ddistn, args = c( list( x = z ), distn.args ) )
+		lines( z, zd, ... )
+		if( add.legend ) legend( "topleft", legend = paste( distnLongName, "PDF" ), lty = 1, bty = "n" )
+
+	} # end of if add theoretical density stmt.
+
+	invisible()
+
+} # end of 'plotBootHist' function.
+
+plotBootQQ2 <- function( x, ..., which, col, pnames ) {
+
+	if( length( which ) != 2 ) stop( "plotBootQQ2: invalid which argument.  Must have length 2." )
+	if( length( col ) > 1 ) col <- col[ 1 ]
+
+	y <- x$results[ which[ 1 ], ]
+	z <- x$results[ which[ 2 ], ]
+
+	qqplot( y, z, xlab = pnames[ 1 ], ylab = pnames[ 2 ] )
+
+	invisible()
+
+} # end of 'plotBootQQ2' function.
 
 ci.booted <- function( x, alpha = 0.05, ..., type = c( "perc", "basic", "stud", "bca", "norm" ) ) {
 

@@ -6,6 +6,13 @@
 \alias{print.tibRMed}
 \alias{plot.tibbed}
 \alias{plot.tibRMed}
+\alias{plot.booted}
+\alias{plotBootBox}
+\alias{plotBootECDF}
+\alias{plotBootHist}
+\alias{plotBootQQ}
+\alias{plotBootQQ2} 
+
 \title{
   distillery Internal and Secondary Functions
 }
