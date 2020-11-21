@@ -1,0 +1,11 @@
+citHeader("To cite package 'distillery' in publications use:")
+
+bibentry(bibtype = "Article",
+         title = "{Bootstrap methods for statistical inference. Part I: Comparative forecast verification for continuous variables}",
+         author = c( person("Eric", "Gilleland") ),
+	journal = "{Journal of Atmospheric and Oceanic Technology}",
+         year = "2020",
+	volume = "37",
+	number = "11",
+	pages = "2117--2134",
+	doi = "10.1175/JTECH-D-20-0069.1" )
