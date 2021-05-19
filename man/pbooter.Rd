@@ -80,7 +80,7 @@ res <- pbooter( x = z, statistic = zfun, rmodel = rfun, B = 500,
 
 print( res )
 
-ci( res )
+\dontrun{ci( res )}
 
 }
 \keyword{ distribution }% use one of  RShowDoc("KEYWORDS")

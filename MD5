@@ -1,5 +1,5 @@
 393a5ca445f6965873eca0259a17f833 *COPYING
-175c9bd0d7056ff92d3ac1291bbbfad9 *DESCRIPTION
+05dda2265a92298ff42d6ce97adb9b73 *DESCRIPTION
 23901a54e79d93301d2857b3d296d260 *NAMESPACE
 de7c046b31ce7525ca56dc5b68934644 *R/MatrixSqrt.R
 26f000972cd360226a2bb70c3eaacdf2 *R/booter.R
@@ -9,7 +9,7 @@ cc36cfdda4e2d0f0d643fe320ee0f13e *R/functions.R
 caffd0b7deb8208e76759f96404afd2c *R/tibber.R
 f0264c7a380aca066cb28e0512a3a80e *inst/CITATION
 c74214a280b8e98f0f1e0d34d365a5c3 *man/MatrixSqrt.Rd
-a54ae4a76b6c3e853e47e7130f306063 *man/booter.Rd
+3368650e6a0231452dbb244de242503e *man/booter.Rd
 296208b40e208efa6c7de98de9d13eff *man/ci.Rd
 afb58b361743f26b1a58485062d76a16 *man/ci.booted.Rd
 436cb6761e013abdafda39e457dbc8c7 *man/datagrabber.Rd
@@ -18,5 +18,5 @@ bf49942a3c0508c27b5c3b9a977ffc44 *man/distill.Rd
 3344f4d128a935c7678ab56cba7472e3 *man/distillery-package.Rd
 2c22cbbd95e86a7122109437e4f7ef3a *man/is.even.Rd
 0525c49c6e229e95fa84affd0e1f470b *man/is.formula.Rd
-bda4d7fb748d7f94b58592cf88a09a65 *man/pbooter.Rd
+c263c77c25e9515462ab27ab3e22695c *man/pbooter.Rd
 0a05a2c328b8e4a5d494d935d595fa68 *man/tibber.Rd

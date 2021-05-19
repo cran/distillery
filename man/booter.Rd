@@ -91,7 +91,7 @@ res <- booter( x = z, statistic = zfun, B = 500, v.terms = c(2, 4) )
 
 print( res )
 
-ci( res )
+\dontrun{ ci( res ) }
 }
 \keyword{ datagen }% use one of  RShowDoc("KEYWORDS")
 \keyword{ distribution }% __ONLY ONE__ keyword per line
