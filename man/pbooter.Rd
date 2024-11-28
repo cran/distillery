@@ -54,7 +54,7 @@ A list object of class \dQuote{booted} is returned with components:
 }
 
 \references{
-Efron, B. and Tibshirani, R. J. (1998) \emph{An Introduction to the Bootstrap}.  Chapman \& Hall, Boca Raton, Florida, 436 pp.
+Efron, B. and Tibshirani, R. J. (1998) \emph{An Introduction to the Bootstrap}.  Chapman and Hall, Boca Raton, Florida, 436 pp.
 }
 \author{
 Eric Gilleland

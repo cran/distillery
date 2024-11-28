@@ -1,4 +1,4 @@
-booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle = NULL, replace = TRUE, ... ) {
+booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle = NULL, ... ) {
 
     theCall <- match.call()
 
@@ -18,7 +18,7 @@ booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle =
 
         sz <- rsize / block.length
 
-        id <- sample( 1:N, size = sz * B, replace = replace )
+        id <- sample( 1:N, size = sz * B, replace = TRUE )
 
         if( block.length > 1 ) {
 
@@ -64,7 +64,6 @@ booter <- function( x, statistic, B, rsize, block.length = 1, v.terms, shuffle =
     out$statistic.args <- list( ... )
     out$B <- B
     out$block.length <- block.length
-    out$replace <- replace
     if( !missing( v.terms ) ) out$v.terms <- v.terms
     out$rsize <- rsize
     out$indices <- id
@@ -523,22 +522,15 @@ print.booted <- function( x, ... ) {
 
     if( x$type == "iid" ) {
 
-	if( x$replace ) cat( "IID Resample Bootstrap with replacement with ", x$B, " resamples of size ", x$rsize, ".\n" )
-	else cat( "IID Resample Bootstrap without replacement with ", x$B, " resamples of size ", x$rsize, ".\n" )
+	cat( "IID Resample Bootstrap with replacement with ", x$B, " resamples of size ", x$rsize, ".\n" )
 
     } else if( x$type == "cbb" ) {
-
-	if( x$replace ) {
 
 	    cat( "Circular Block Bootstrap Resampling with blocks of length ", x$block.length,
 	        ",\n", x$B, " resamples with replacement of size ", x$rsize, ".\n" )
 
-	} else {
 
-	    cat( "Circular Block Bootstrap Resampling with blocks of length ", x$block.length,
-                ",\n", x$B, " resamples without replacement of size ", x$rsize, ".\n" )
-
-	}
+	
 
     } else if( x$type == "parametric" ) {
 

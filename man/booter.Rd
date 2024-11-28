@@ -8,7 +8,7 @@ Generate B bootstrap replicates of size rsize and apply a statistic to them.  Ca
 }
 \usage{
 booter(x, statistic, B, rsize, block.length = 1, v.terms, shuffle = NULL,
-    replace = TRUE, ...)
+    ...)
 }
 \arguments{
   \item{x}{
@@ -25,9 +25,6 @@ Number giving the resample size for each bootstrap sample.  Must be between 1 an
 }
   \item{block.length}{
 Number giving the desired block lengths.  Default (\code{block.length} = 1) is to do IID resamples.  Should be longer than the length of dependence in the data, but much shorter than the size of the data.
-}
-  \item{replace}{
-logical, should the resamples be taken with replacement?
 }
   \item{v.terms}{
 If \code{statistic} returns variance estimates for other parameters, then use this argument to specify the indices returned that give the variance estimates.  There must be a component for every other parameter returned, and they must be in the same order as the other parameters (see examples below).  If an estimate does not exist, an NA should be returned for that spot.
@@ -54,7 +51,6 @@ A list object of class \dQuote{booted} is returned with components:
   \item{statistic.args}{all other arguments passed by \dots}
   \item{B}{ Number of bootstrap replicate samples}
   \item{block.length}{ The block length used}
-  \item{replace}{logical stating whether the samples are taken with replacement or not. }
   \item{v.terms}{if variance terms are returned by statistic, the argument is repeated in the returned object.}
   \item{rsize}{the size of the bootstrap resamples.}
   \item{indices}{rsize by B matrix giving the resample indices used (rows) for each bootstrap resample (columns).}
@@ -65,7 +61,7 @@ A list object of class \dQuote{booted} is returned with components:
   \item{type}{character stating whether the resample method is iid or cbb.}
 }
 \references{
-Efron, B. and Tibshirani, R. J. (1998) \emph{An Introduction to the Bootstrap}.  Chapman \& Hall, Boca Raton, Florida, 436 pp.
+Efron, B. and Tibshirani, R. J. (1998) \emph{An Introduction to the Bootstrap}.  Chapman and Hall, Boca Raton, Florida, 436 pp.
 
 Lahiri, S. N. (2003) \emph{Resampling Methods for Dependent Data}.  Springer-Verlag, New York, New York, 374 pp.
 }

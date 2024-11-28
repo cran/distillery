@@ -50,7 +50,7 @@ A list object of class \dQuote{ci.booted} is returned with components depending 
   \item{bias.correction, accelerated}{If type includes \dQuote{bca}, then the estiamted bias correction factor and acceleration are given in these components. }
 }
 \references{
-Efron, B. and Tibshirani, R. J. (1998) \emph{An Introduction to the Bootstrap}.  Chapman \& Hall, Boca Raton, Florida, 436 pp.
+Efron, B. and Tibshirani, R. J. (1998) \emph{An Introduction to the Bootstrap}.  Chapman and Hall, Boca Raton, Florida, 436 pp.
 }
 \author{
 Eric Gilleland

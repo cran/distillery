@@ -150,10 +150,10 @@ plot( look )
 # outer vertical blue lines should cross horizontal blue lines
 # near where an estimated p-value is located.
 
+\dontrun{
 tibber( x = y, statistic = trm, B = 500, rmodel = genf, test.pars = 1 )
 
 
-\dontrun{
 look2 <- tibberRM(x = y, statistic = trm, B = 500, rmodel = genf, startval = 1,
     step.size = 0.03, verbose = TRUE )
 
